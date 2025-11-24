@@ -33,7 +33,7 @@ namespace decMuc\PDOdb;
 if (!defined('PDOdb_HEURISTIC_WHERE_CHECK')) {
     define('PDOdb_HEURISTIC_WHERE_CHECK', true);
 }
-final class PDOdb
+class PDOdb
 {
 
 
