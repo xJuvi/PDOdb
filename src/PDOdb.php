@@ -2967,13 +2967,14 @@ final class PDOdb
         // Sicherheitsfilter auf rohes ORDER BY-Feld anwenden
         $this->_secureValidateSqlExpression($orderByField);
 
+        // https://github.com/decMuc/PDOdb/issues/13 Thanks to xJuvi
         // Prefixing (nur wenn kein schema.table vorhanden ist)
-        $prefix = $this->getPrefix();
-        if (!str_contains($orderByField, '.')) {
-            $orderByField = $prefix . $orderByField;
-        } elseif (preg_match('/^`([a-zA-Z0-9_]+)`\.`([a-zA-Z0-9_]+)`$/', $orderByField, $m)) {
-            $orderByField = '`' . $prefix . $m[1] . '`.`' . $m[2] . '`';
-        }
+        // $prefix = $this->getPrefix();
+        // if (!str_contains($orderByField, '.')) {
+        //    $orderByField = $prefix . $orderByField;
+        // } elseif (preg_match('/^`([a-zA-Z0-9_]+)`\.`([a-zA-Z0-9_]+)`$/', $orderByField, $m)) {
+        //    $orderByField = '`' . $prefix . $m[1] . '`.`' . $m[2] . '`';
+        // }
 
         // Spezialfälle: FIELD() oder REGEXP
         if (is_array($customFieldsOrRegExp)) {
