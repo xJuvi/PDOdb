@@ -3918,10 +3918,81 @@ final class PDOdb
             return;
         }
 
+        // Error handling for grouping
+		$open = 0;
+		$close = 0;
+		$stack = [];
+		foreach ($conditions as $item) {
+			if (is_array($item) && isset($item['__group_open'])) {
+				$open++;
+				$stack[] = 0; // 0 = no conditions at this group for the moment
+			}
+
+			if (is_array($item) && isset($item['__group_close'])) {
+				$close++;
+
+				if (empty($stack)) {
+					$this->reset(true);
+					throw $this->handleException(
+						new \InvalidArgumentException("Unbalanced WHERE groups: closing group without opening."),
+						'_buildCondition'
+					);
+				}
+
+				$count = array_pop($stack);
+				if ($count === 0) {
+					$this->reset(true);
+					throw $this->handleException(
+						new \InvalidArgumentException("Empty WHERE group detected."),
+						'_buildCondition'
+					);
+				}
+			}
+
+			// normale Condition → markiere aktuelle Gruppe als nicht leer
+			if (!isset($item['__group_open']) && !isset($item['__group_close'])) {
+				if (!empty($stack)) {
+					$stack[count($stack)-1]++;
+				}
+			}
+		}
+
+		if ($open !== $close) {
+			$this->reset(true);
+			throw $this->handleException(
+				new \InvalidArgumentException("Unbalanced WHERE groups: missing closing parenthesis."),
+					'_buildCondition'
+			);
+		}
+
         $this->_query .= ' ' . $operator . ' ';
 
-        foreach ($conditions as [$cond, $column, $comparison, $value]) {
-            $this->_query .= $cond ? " {$cond} " : '';
+        $firstElement = true;
+		foreach ($conditions as $item) {
+			// Group open token
+			if (is_array($item) && isset($item['__group_open'])) {
+				$bool = $item['operator'] ?? 'AND';
+				if (!$firstElement) {
+					$this->_query .= " {$bool} (";
+				} else {
+					$this->_query .= " (";
+				}
+				$firstElement = true;
+				continue;
+			}
+			
+			// Group close token
+			if (is_array($item) && isset($item['__group_close'])) {
+				$this->_query .= ')';
+				$firstElement = false;
+				continue;
+			}
+			
+			// Normal condition eval
+			[$cond, $column, $comparison, $value] = $item;
+			$this->_query .= ($cond && !$firstElement) ? " {$cond} " : '';
+			$firstElement = false;
+            
             // === PATCH: RAW support ===
             if ($column === '[RAW]') {
                 // keine zweite $cond-Anfügung hier!
@@ -5535,7 +5606,7 @@ final class PDOdb
         }
 
         foreach ($stack as $i => $item) {
-            if (is_array($item) && isset($item[1]) && $item[1] === '[RAW]') {
+            if (is_array($item) && (isset($item[1]) && $item[1] === '[RAW]' || isset($item['__group_open']) || isset($item['__group_close']))) {
                 continue;
             }
             if (!is_array($item) || !isset($item['__DEFERRED__'])) {
