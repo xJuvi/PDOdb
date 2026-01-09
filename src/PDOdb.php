@@ -2327,6 +2327,44 @@ final class PDOdb
 
         return $this;
     }
+	
+	/**
+     * Adds a marker to open a where Group
+     *
+     * @param string $operator Concat operator (defaults to AND')
+     * @return self
+     */
+	public function openWhereGroup(string $operator = 'AND'): self
+	{
+		$this->_where[] = ['__group_open' => true, 'operator' => strtoupper($operator)];
+		return $this;
+	}
+	
+	/**
+     * Adds a marker to close a where Group
+     *
+     * @return self
+     */
+	public function closeWhereGroup(): self
+	{
+		$this->_where[] = ['__group_close' => true];
+		return $this;
+	}
+	
+	/**
+     * Adds a complete where group with a callback.
+     *
+     * @param callable $cb Callback to perform inside the group
+     * @param string $operator Concat operator (defaults to AND')
+     * @return self
+     */
+	public function whereGroup(callable $cb, string $operator = 'AND'): self
+	{
+		$this->openWhereGroup($operator);
+		$cb($this);
+		$this->closeWhereGroup();
+		return $this;
+	}
 
     /**
      * Adds a WHERE condition to the query builder.
