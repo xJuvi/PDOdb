@@ -3898,20 +3898,25 @@ final class PDOdb
     protected function _bindParam(mixed $value): void
     {
         if (is_array($value) && isset($value['value'], $value['type'])) {
-            $value['value'] = $this->_normalizeDecimalStringSimple($value['value']);
+			if($value['type'] !== \PDO::PARAM_LOB) {
+				$value['value'] = $this->_normalizeDecimalStringSimple($value['value']);
+			}
             $this->_bindParams[] = $value;
             return;
         }
 
-        $value = $this->_normalizeDecimalStringSimple($value);
-
         static $typeMap = [
-            'integer' => \PDO::PARAM_INT,
-            'boolean' => \PDO::PARAM_BOOL,
-            'NULL'    => \PDO::PARAM_NULL,
+            'integer' 	=> \PDO::PARAM_INT,
+            'boolean' 	=> \PDO::PARAM_BOOL,
+            'NULL'    	=> \PDO::PARAM_NULL,
+            'ressource' => \PDO::PARAM_LOB,
         ];
 
         $type = $typeMap[gettype($value)] ?? \PDO::PARAM_STR;
+		
+		if($type !== \PDO::PARAM_LOB) {
+			$value = $this->_normalizeDecimalStringSimple($value);
+		}
 
         $this->_bindParams[] = [
             'value' => $value,
@@ -6428,6 +6433,10 @@ final class PDOdb
             return $s === '' ? '0' : $s;
         }
         if (!is_string($value)) return $value;
+		
+		if(!mb_check_encoding($value, 'UTF-8')) {
+			return $value;
+		}
 
         $s = trim($value);
         if ($s === '') return $value;
