@@ -1,5 +1,5 @@
 {
-  "name": "decmuc/pdodb",
+  "name": "xjuvi/pdodb",
   "description": "Modern, secure and fully compatible PDO-based replacement for ThingEngineer’s PHP-MySQLi-Database-Class",
   "keywords": ["pdo", "database", "orm", "mysqli", "thingengineer", "wrapper"],
   "type": "library",
@@ -8,6 +8,10 @@
     {
       "name": "decmuc",
       "homepage": "https://github.com/decmuc"
+    },
+	{
+      "name": "xjuvi",
+      "homepage": "https://github.com/xJuvi"
     }
   ],
   "autoload": {
