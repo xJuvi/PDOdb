@@ -3962,17 +3962,14 @@ final class PDOdb
         }
 
         // Error handling for grouping
-		$open = 0;
-		$close = 0;
 		$stack = [];
 		foreach ($conditions as $item) {
 			if (is_array($item) && isset($item['__group_open'])) {
-				$open++;
-				$stack[] = 0; // 0 = no conditions at this group for the moment
+				$stack[] = false; // false = no conditions at this group for the moment
+				continue;
 			}
 
 			if (is_array($item) && isset($item['__group_close'])) {
-				$close++;
 
 				if (empty($stack)) {
 					$this->reset(true);
@@ -3990,21 +3987,27 @@ final class PDOdb
 						'_buildCondition'
 					);
 				}
+				
+				// mark parent group as not empty
+				if (!empty($stack)) {
+					$stack[count($stack) - 1] = true;
+				}
 			}
 
-			// normale Condition → markiere aktuelle Gruppe als nicht leer
+			// normal condition, mark group as not empty
 			if (!isset($item['__group_open']) && !isset($item['__group_close'])) {
 				if (!empty($stack)) {
-					$stack[count($stack)-1]++;
+					$stack[count($stack)-1] = true;
 				}
 			}
 		}
-
-		if ($open !== $close) {
+		
+		// not all groups are closed
+		if (!empty($stack)) {
 			$this->reset(true);
 			throw $this->handleException(
 				new \InvalidArgumentException("Unbalanced WHERE groups: missing closing parenthesis."),
-					'_buildCondition'
+				'_buildCondition'
 			);
 		}
 

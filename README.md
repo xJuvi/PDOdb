@@ -1,5 +1,11 @@
 # PDOdb – A Secure, Powerful MySQL Engine for PDO (PHP 8+)
 
+[![Github stars](https://img.shields.io/github/stars/xjuvi/pdodb?label=GitHub%20stars&color=007ec6&style=flat-square)](https://github.com/xjuvi/pdodb)
+[![Latest Version](https://img.shields.io/packagist/v/xjuvi/pdodb.svg?style=flat-square)](https://packagist.org/packages/xjuvi/pdodb)
+[![Total Downloads](https://img.shields.io/packagist/dt/xjuvi/pdodb.svg?style=flat-square)](https://packagist.org/packages/xjuvi/pdodb)
+[![Open issues](https://img.shields.io/github/issues/xjuvi/pdodb?label=Open%20issues&style=flat-square)](https://github.com/xjuvi/pdodb/issues)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/xjuvi/pdodb/blob/master/LICENSE)
+
 PDOdb is a modern database wrapper and SQL builder for PHP 8+, built on top of PDO.  
 It offers full support for secure query building, prepared statements, dynamic joins, subqueries, transactions, and strict validation.
 
@@ -24,7 +30,7 @@ It offers full support for secure query building, prepared statements, dynamic j
 ## Installation
 
 ```bash
-composer require decmuc/pdodb
+composer require xjuvi/pdodb
 ```
 
 ---
