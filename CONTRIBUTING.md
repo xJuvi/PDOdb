@@ -1,4 +1,4 @@
-# Contributing to tom-select
+# Contributing
 
 We welcome contributions from anyone.
 
